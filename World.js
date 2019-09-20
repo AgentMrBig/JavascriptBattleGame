@@ -1,8 +1,14 @@
+new p5();
 
-const test = new Entity(200, 200, 25, 50, 50, 10, "test1", "ellipse")
+const test = new Entity(0, 0)
+const clock = new Clock()
 
 function setup() {
+
+
     createCanvas(window.innerWidth - 10, window.innerHeight - 22);
+    angleMode(DEGREES);
+    colorMode(RGB, 100);
 }
 
 function draw() {
@@ -10,10 +16,12 @@ function draw() {
     //test.drawEntity("ellipse");
     //ellipse(50, 50, 80, 80);
     //testEllipse();
-
     test.Update();
+
+
+    //clock.Update();
+
+
 }
 
 
-
-console.log(test)

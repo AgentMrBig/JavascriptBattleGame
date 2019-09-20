@@ -5,29 +5,74 @@
 //  is sensed.
 
 class Entity {
-    constructor(x, y, r, sizeX, sizeY, startLife, startSpeed, _id, entityType) {
-        this._id = _id;
+    constructor(x, y) {
+        this._id = 0;
         this.x = x;
         this.y = y;
-        this.r = r;
-        this.sizeX = sizeX;
-        this.sizeY = sizeY;
-        this.startLife = startLife;
-        this.startSpeed = startSpeed;
-        this.entityType = entityType;
+        this.r = this.startSize;
+        this.startSize = 200;
+        this.startLife = 100;
+        this.startSpeed = 5;
+        this.lifespan = 100;
+        this.size = this.startSize;
+        this.birthMoment = 0;
+        this.isAlive = true;
     }
 
+    // Get_birthMoment() gets the year.month.day.hour.minute.second.millisecond time once and set that to the
+    // birthMoment property as well as the _id property as this time string will be unique
+    // so all _id's will be unique. This will also allow us to tell the entity age.
+    Get_birthMoment() {
+        if (this.birthMoment == 0) {
+            this.birthMoment = year() + '.' + month() + '.' + day() + '.' + hour() + '.' + minute() + '.' + second() + '.' + millis();
+        }
+        if (this._id == 0 && this.birthMoment != 0) {
+            this._id = this.birthMoment;
+        }
+        textSize(18);
+        text(this.birthMoment, 200, 200);
+
+    }
+
+    EntitySetup() {
+        push();
+        translate(window.innerHeight / 2, window.innerWidth / 2);
+        strokeWeight(2)
+        stroke(100, 100, 100, 100);
+        noFill();
+        circle(this.x, this.y, this.startSize);
+
+        pop();
+
+    }
 
     // drawEntity is where we will define how we want our entity to look
     DrawEntity() {
-        // if (entityType === "ellipse") {
-        //     return ellipse(50, 50, 80, 80);
-        // }
+        //If the entity is alive, draw the entity
+        if (this.isAlive) {
+            this.EntitySetup();
+            translate(window.innerHeight / 2, window.innerWidth / 2);
+            rotate(-90);
+            push();
 
-        return ellipse(this.x, this.y, this.r * 2, this.r * 2);
+            pop();
+            strokeWeight(2)
+            stroke(100, 0, 0, 100);
+            noFill();
+            let lifeAngleBar = map(this.lifespan, 0, 100, 0, 360);
+            arc(0, 0, this.size - 10, this.size - 10, 0, lifeAngleBar)
+
+            // stroke(0, 100, 0, 100);
+            // let minuteAngle = map(this.mn, 0, 60, 0, 360);
+            // arc(0, 0, 280, 280, 0, minuteAngle)
+
+            // stroke(0, 0, 100, 100);
+            // let hourAngle = map(this.hr % 12, 0, 12, 0, 360);
+            // arc(0, 0, 260, 260, 0, hourAngle)
+        }
+
 
     }
-
 
     SetState() {
         //TODO here I will set the state of the entity based on 
@@ -37,43 +82,19 @@ class Entity {
         // color as well as movements
     }
 
-    Move() {
-        this.x = this.x + random(-1, 1);
-    }
+    BiologicalClock() {
+        if (this.lifespan > 0) {
+            this.lifespan -= 0.1;
 
-    Wonder(xORy, direction) {
-        if (xORy === "x") {
-            if (direction === "-") {
-                this.x = this.x + -1;
-            } else if (direction === "+") {
-                this.x = this.x + 1;
-            }
+            rotate(90);
+            text(this.lifespan, this.x, this.y);
 
-        } else if (xORy === "y") {
-            if (direction === "-") {
-                this.y = this.y + -1;
-            } else if (direction === "+") {
-                this.y = this.y + 1;
-            }
         }
-    }
 
-    RandomDir() {
+        if (this.lifespan <= 0) {
+            this.Die();
+        }
 
-    }
-
-    RandomXorY() {
-
-    }
-
-
-
-    ChangeStroke(value) {
-        stroke(value);
-    }
-
-    ChangeFill(value) {
-        fill(value);
     }
 
     ChangeSize() {
@@ -82,13 +103,25 @@ class Entity {
 
     // This function is for updating the entity, it is called within the main draw function 
     Update() {
-        this.DrawEntity();
-        this.ChangeSize();
-        //this.Move();
-        this.ChangeFill(0o0);
-        this.ChangeStroke(255);
-        this.Wonder("x", "+")
+        push();
 
+        this.EntitySetup();
+        this.DrawEntity();
+
+        this.BiologicalClock();
+
+        this.Get_birthMoment();
+        pop();
+
+
+
+
+    }
+
+
+    // Kill the entity
+    Die() {
+        this.isAlive = false;
     }
 }
 
